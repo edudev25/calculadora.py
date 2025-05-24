@@ -1,0 +1,262 @@
+import json
+import os
+import re
+import webbrowser
+
+ARQUIVO_USUARIOS = "usuarios.json"
+
+PERGUNTAS_QUIZ = [
+    {
+        "pergunta": "O que significa 'phishing' em cibersegurança?",
+        "opcoes": [
+            "A) Acesso não autorizado a dados",
+            "B) Envio de e-mails fraudulentos para enganar usuários",
+            "C) Instalar software antivírus",
+            "D) Criptografar arquivos para proteção"
+        ],
+        "resposta": "B"
+    },
+    {
+        "pergunta": "Qual é uma senha forte?",
+        "opcoes": [
+            "A) 123456",
+            "B) senha",
+            "C) P@ssw0rd!2023",
+            "D) qwerty"
+        ],
+        "resposta": "C"
+    },
+    {
+        "pergunta": "Para que serve um firewall?",
+        "opcoes": [
+            "A) Cozinhar alimentos",
+            "B) Bloquear acesso não autorizado à rede",
+            "C) Monitorar a temperatura da CPU",
+            "D) Limpar vírus do computador"
+        ],
+        "resposta": "B"
+    },
+    {
+        "pergunta": "O que significa 'malware'?",
+        "opcoes": [
+            "A) Software malicioso",
+            "B) Falha de hardware",
+            "C) Software legal",
+            "D) Atualização de software"
+        ],
+        "resposta": "A"
+    }
+]
+
+PERGUNTAS_PYTHON = [
+    {
+        "pergunta": "Como declarar uma variável em Python?",
+        "opcoes": [
+            "A) var x = 10",
+            "B) int x = 10",
+            "C) x := 10",
+            "D) x = 10"
+        ],
+        "resposta": "D"
+    },
+    {
+        "pergunta": "Qual comando é usado para ler dados do usuário no terminal?",
+        "opcoes": [
+            "A) scanf()",
+            "B) input()",
+            "C) cin>>",
+            "D) gets()"
+        ],
+        "resposta": "B"
+    },
+    {
+        "pergunta": "Qual dos seguintes é um tipo de dado em Python?",
+        "opcoes": [
+            "A) string",
+            "B) texto",
+            "C) decimal",
+            "D) caractere"
+        ],
+        "resposta": "A"
+    },
+    {
+        "pergunta": "Como abrir um arquivo JSON para leitura em Python?",
+        "opcoes": [
+            "A) open('arquivo.json', 'w')",
+            "B) open('arquivo.json', 'x')",
+            "C) open('arquivo.json', 'r')",
+            "D) open('arquivo.json', 'a')"
+        ],
+        "resposta": "C"
+    }
+]
+
+VIDEO_AULAS = {
+    "1": {
+        "titulo": "Python Full Course for Beginners",
+        "conteudo": "Curso completo de Python para iniciantes. Inclui instalação, sintaxe, variáveis, estruturas de controle, funções, módulos e muito mais.",
+        "link": "https://www.youtube.com/watch?v=_uQrJ0TkZlc"
+    }
+}
+
+def carregar_usuarios():
+    if not os.path.isfile(ARQUIVO_USUARIOS):
+        return {}
+    with open(ARQUIVO_USUARIOS, "r") as arquivo:
+        try:
+            return json.load(arquivo)
+        except json.JSONDecodeError:
+            return {}
+
+def salvar_usuarios(usuarios):
+    with open(ARQUIVO_USUARIOS, "w") as arquivo:
+        json.dump(usuarios, arquivo, indent=4)
+
+def senha_valida(senha):
+    if len(senha) < 8:
+        print("A senha deve ter no mínimo 8 caracteres.")
+        return False
+    if not re.search(r"[A-Z]", senha):
+        print("A senha deve conter pelo menos uma letra maiúscula.")
+        return False
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha):
+        print("A senha deve conter pelo menos um caractere especial.")
+        return False
+    return True
+
+def cadastrar_usuario(usuarios):
+    print("\n--- Cadastro de Novo Usuário ---")
+    while True:
+        usuario = input("Nome de usuário: ").strip()
+        if usuario in usuarios:
+            print("Este nome de usuário já existe. Tente outro.")
+            continue
+        if not usuario:
+            print("O nome de usuário não pode ser vazio.")
+            continue
+        break
+    while True:
+        senha = input("Senha: ").strip()
+        if not senha:
+            print("A senha não pode ser vazia.")
+            continue
+        if not senha_valida(senha):
+            continue
+        break
+    usuarios[usuario] = {"senha": senha}
+    salvar_usuarios(usuarios)
+    print(f"Usuário '{usuario}' cadastrado com sucesso!")
+
+def logar_usuario(usuarios):
+    print("\n--- Login ---")
+    usuario = input("Nome de usuário: ").strip()
+    senha = input("Senha: ").strip()
+    dados_usuario = usuarios.get(usuario)
+    if dados_usuario and dados_usuario.get("senha") == senha:
+        print(f"Login realizado com sucesso! Bem-vindo, {usuario}!")
+        return usuario
+    else:
+        print("Usuário ou senha incorretos.")
+        return None
+
+def quiz_ciberseguranca():
+    print("\n--- Quiz: Cibersegurança ---")
+    pontuacao = 0
+    for i, pergunta in enumerate(PERGUNTAS_QUIZ, start=1):
+        print(f"\nPergunta {i}: {pergunta['pergunta']}")
+        for opcao in pergunta["opcoes"]:
+            print(opcao)
+        while True:
+            resposta = input("Resposta (A, B, C, D): ").strip().upper()
+            if resposta not in ('A', 'B', 'C', 'D'):
+                print("Por favor, digite A, B, C ou D.")
+                continue
+            break
+        if resposta == pergunta["resposta"]:
+            print("Resposta correta!")
+            pontuacao += 1
+        else:
+            print(f"Resposta incorreta! A resposta correta é {pergunta['resposta']}.")
+    print(f"\nVocê acertou {pontuacao} de {len(PERGUNTAS_QUIZ)} perguntas.")
+
+def quiz_sistema_python():
+    print("\n--- Quiz: Sistema Python ---")
+    pontuacao = 0
+    for i, pergunta in enumerate(PERGUNTAS_PYTHON, start=1):
+        print(f"\nPergunta {i}: {pergunta['pergunta']}")
+        for opcao in pergunta["opcoes"]:
+            print(opcao)
+        while True:
+            resposta = input("Resposta (A, B, C, D): ").strip().upper()
+            if resposta not in ('A', 'B', 'C', 'D'):
+                print("Por favor, digite A, B, C ou D.")
+                continue
+            break
+        if resposta == pergunta["resposta"]:
+            print("Resposta correta!")
+            pontuacao += 1
+        else:
+            print(f"Resposta incorreta! A resposta correta é {pergunta['resposta']}.")
+    print(f"\nVocê acertou {pontuacao} de {len(PERGUNTAS_PYTHON)} perguntas.")
+
+def mostrar_video_aulas():
+    print("\n--- Vídeo Aula ---")
+    for numero, aula in VIDEO_AULAS.items():
+        print(f"{numero}. {aula['titulo']}")
+    print("0. Voltar")
+    while True:
+        escolha = input("Escolha a aula para assistir (0 para voltar): ").strip()
+        if escolha == "0":
+            return
+        if escolha in VIDEO_AULAS:
+            aula = VIDEO_AULAS[escolha]
+            print(f"\n=== {aula['titulo']} ===")
+            print(aula['conteudo'])
+            print("Abrindo o vídeo no navegador...")
+            webbrowser.open(aula['link'])
+            input("\nPressione Enter para voltar ao menu de vídeo aulas...")
+        else:
+            print("Opção inválida. Tente novamente.")
+
+def menu_principal(usuario):
+    while True:
+        print(f"\n--- Plataforma - Usuário: {usuario} ---")
+        print("1. Quiz sobre Cibersegurança")
+        print("2. Quiz sobre Sistema Python")
+        print("3. Vídeo aula")
+        print("4. Sair da plataforma")
+        opcao = input("Escolha uma opção: ").strip()
+        if opcao == "1":
+            quiz_ciberseguranca()
+        elif opcao == "2":
+            quiz_sistema_python()
+        elif opcao == "3":
+            mostrar_video_aulas()
+        elif opcao == "4":
+            print("Saindo da plataforma. Até logo!")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
+def main():
+    usuarios = carregar_usuarios()
+    print("=== Plataforma Educacional ===")
+    while True:
+        print("\n1. Login")
+        print("2. Cadastro")
+        print("3. Sair")
+        escolha = input("Escolha uma opção: ").strip()
+        if escolha == "1":
+            usuario = logar_usuario(usuarios)
+            if usuario:
+                menu_principal(usuario)
+        elif escolha == "2":
+            cadastrar_usuario(usuarios)
+        elif escolha == "3":
+            print("Saindo da aplicação. Até logo!")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    main()
